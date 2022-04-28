@@ -9,8 +9,9 @@ import auth from "../../../firebase.init";
 import Loading from "../../Shared/Loading/Loading";
 import SocialLogin from "../SocialLogin/SocialLogin";
 
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const Login = () => {
   const emailRef = useRef("");
@@ -32,14 +33,17 @@ const Login = () => {
   const location = useLocation();
   let form = location.state?.from?.pathname || "/";
   if (user) {
-    navigate(form, { replace: true });
+    // navigate(form, { replace: true });
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-    signInWithEmailAndPassword(email, password);
+    await signInWithEmailAndPassword(email, password);
+    const { data } = await axios.post("http://localhost:5000/login", { email });
+    localStorage.setItem("accessToken", data.accessToken);
+    navigate(form, { replace: true });
   };
 
   const navigateToRegister = (event) => {
@@ -104,7 +108,6 @@ const Login = () => {
         </button>
       </p>
       <SocialLogin />
-      <ToastContainer />
     </div>
   );
 };
